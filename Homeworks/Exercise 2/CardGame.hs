@@ -1,4 +1,4 @@
-module Bonus where
+module CardGame where
 
 import Data.Char 
 
@@ -37,7 +37,7 @@ sumCards []  = 0
 sumCards cs  = sumValues cs 0
     where
         sumValues::[Card] -> Int -> Int
-        sumValues [] acc     = 0
+        sumValues [] acc     = acc
         sumValues (c:cs) acc = sumValues cs (acc + cardValue c)
 
 score::[Card] -> Int -> Int
@@ -58,10 +58,12 @@ runGame::[Card] -> [Move] -> Int -> Int
 runGame cards moves goal = run cards [] moves goal (state cards)
     where
         run::[Card] -> [Card] -> [Move] -> Int -> Bool -> Int
-        run cards@(c:cs) heldCards moves@(m:ms) goal state = case (m,state) of
-            (_, False)            -> score cards goal
-            ((Discard c), True)   -> run cards (removeCard heldCards c) ms goal state
-            (Draw, True)          -> if (sumCards heldCards) > goal then score cs goal else run (removeCard cards c) (c : heldCards) ms goal state            
+        run _ heldCards [] goal _ = score heldCards goal
+        run [] heldCards _ goal _ = score heldCards goal
+        run cards@(c:cs) heldCards moves@(m:ms) goal stateX = case (m,stateX) of
+            (_, False)            -> score heldCards goal
+            ((Discard c), True)   -> run cards (removeCard heldCards c) ms goal stateX
+            (Draw, True)          -> if (sumCards (c : heldCards)) > goal then score (c : heldCards) goal else run (removeCard cards c) (c : heldCards) ms goal (state cs)            
 
 convertSuit::Char->Suit
 convertSuit c
