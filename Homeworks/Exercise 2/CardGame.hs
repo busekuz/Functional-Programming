@@ -22,16 +22,20 @@ cardValue card = case rank card of
     Queen      -> 10
     Num number -> number
 
+
+--Removes given card from deck
 removeCard::[Card] -> Card -> [Card]
 removeCard [] card       = error "This card is not in the deck, deck is empty!"
 removeCard [c] card      = if (c /= card) then error "This card is not in the deck." else []
 removeCard (c:cs) card   = if (c == card) then cs else  (c : removeCard cs card)
 
+--Checks if all cards are same colour
 allSameColor::[Card] -> Bool
 allSameColor []          = True
 allSameColor [c1]        = True
 allSameColor (c1:c2:cs)  = (cardColor c1 == cardColor c2)  && allSameColor cs
 
+--Returns sum of the cards' values
 sumCards::[Card] -> Int
 sumCards []  = 0
 sumCards cs  = sumValues cs 0
@@ -40,6 +44,7 @@ sumCards cs  = sumValues cs 0
         sumValues [] acc     = acc
         sumValues (c:cs) acc = sumValues cs (acc + cardValue c)
 
+--Calculates score
 score::[Card] -> Int -> Int
 score cards goal
     |(sumCards cards) > goal = checkColor cards (3 * ((sumCards cards) - goal))
@@ -48,23 +53,23 @@ score cards goal
         checkColor::[Card]->Int->Int
         checkColor cs number = if allSameColor cards then div number 2 else number
 
-
+--Returns if there is any card left as a state
 state::[Card]->Bool
 state cards
     |cards == []        = False
     |otherwise          = True      
 
+--Runs game with given cards,moves and goal.
 runGame::[Card] -> [Move] -> Int -> Int
 runGame cards moves goal = run cards [] moves goal (state cards)
     where
         run::[Card] -> [Card] -> [Move] -> Int -> Bool -> Int
         run _ heldCards [] goal _ = score heldCards goal
-        run [] heldCards _ goal _ = score heldCards goal
-        run cards@(c:cs) heldCards moves@(m:ms) goal stateX = case (m,stateX) of
+        run cards@(c:cs) heldCards moves@(m:ms) goal stateOfCards = case (m,stateOfCards) of
             (_, False)            -> score heldCards goal
-            ((Discard c), True)   -> run cards (removeCard heldCards c) ms goal stateX
-            (Draw, True)          -> if (sumCards (c : heldCards)) > goal then score (c : heldCards) goal else run (removeCard cards c) (c : heldCards) ms goal (state cs)            
-
+            ((Discard c), True)   -> run cards (removeCard heldCards c) ms goal True
+            (Draw, True)          -> if sumCards (c : heldCards) > goal then score (c : heldCards) goal 
+                                        else run (removeCard cards c) (c : heldCards) ms goal (state cs)            
 convertSuit::Char->Suit
 convertSuit c
     |c == 'd' || c == 'D'  = Diamonds
@@ -86,6 +91,7 @@ convertRank c
 convertCard::Char->Char->Card
 convertCard suit rank = Card (convertSuit suit) (convertRank rank)
 
+--Reads input
 readCards::[Card]->IO [Card]
 readCards cards = do
     line <- getLine
@@ -93,11 +99,13 @@ readCards cards = do
         else if length line == 2 then readCards (convertCard (line!!0) (line!!1) : cards)
             else error "Card input is not in correct format."
 
+--Decides moves from given characters
 convertMove::Char->Char->Char->Move
 convertMove m s r = case (toLower m,s,r) of
     ('d',_,_)   -> Draw
     ('r',s,r)   -> Discard (convertCard s r)
 
+--Reads input
 readMoves::[Move]-> IO [Move]
 readMoves moves = do
     line <- getLine
