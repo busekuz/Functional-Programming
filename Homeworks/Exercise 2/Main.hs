@@ -1,6 +1,6 @@
 module MainModule where
 
-import Bonus
+import CardGame
 
 main = do 
         putStrLn "Enter cards:"

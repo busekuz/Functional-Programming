@@ -1,3 +1,5 @@
+module CountingSundays where 
+
 -- Part 1
 --Returns day of week  0 = Saturday, 1 = Sunday, ..., 6 = Friday) from given date (yyyy mm dd)
 dayOfWeek::Integer -> Integer -> Integer -> Integer
@@ -15,8 +17,8 @@ dayOfWeek year month day = (day + t + k + (k `div` 4) + (divideFour j) + (5 * j)
 --Part 2
 
 --sundays  calculates the number of months that starts with sunday between given years
-sundays::Integer -> Integer -> Integer
-sundays start end = sundays' start 1
+sundays1::Integer -> Integer -> Integer
+sundays1 start end = sundays' start 1
  where
   sundays' :: Integer -> Integer -> Integer
   sundays' y m
