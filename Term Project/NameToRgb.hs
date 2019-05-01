@@ -1,3 +1,5 @@
+module NameToRgb where
+
 name2rgb::[Char]->(Integer, Integer, Integer)
 name2rgb color = case color of
     "AliceBlue"           -> (240, 248, 255)

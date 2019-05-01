@@ -1,3 +1,5 @@
+module HsvToRgb where
+    
 import Data.Fixed
 hsv2rgb::(Double, Double, Double)->(Double, Double, Double)
 hsv2rgb (h, s, v)
