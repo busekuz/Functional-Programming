@@ -1,6 +1,4 @@
-import Data.Map
-
-colors = fromList([
+colors = [
     ((240, 248, 255), "AliceBlue"),   
     ((250, 235, 215), "AntiqueWhite"), 
     ((0, 255, 255),   "Aqua"), 
@@ -148,15 +146,15 @@ colors = fromList([
     ((255, 255, 255), "White"),            
     ((245, 245, 245), "WhiteSmoke"),        
     ((255, 255, 0),   "Yellow"),             
-    ((154, 205, 50),  "YellowGreen")])
+    ((154, 205, 50),  "YellowGreen")]
 
 
 findColor::(Integer,Integer,Integer)->String
-findColor (r, g, b) = if (member (r, g, b) colors) then (colors ! (r, g, b))
-    else snd (elemAt (findClosest 0 []) colors)
+findColor (r, g, b) = if (isMember (r, g, b) colors) then (colorName colors (r, g, b))
+    else snd (elemAt (findClosest 0 []) colors) --Gets name of RGB value.
     where
         findClosest::Int->[Integer]->Int
-        findClosest index list   = if index == (size colors) then result 
+        findClosest index list   = if index == (length colors) then result 
             else findClosest (index+1) (list ++ [calculateError])  
             where
                 dif = convertToList (fst (elemAt index colors))   --Gets rgb value at the given index.
@@ -177,3 +175,16 @@ findElement list n = find list n 0
         find::[Integer]->Integer->Int->Int
         find [] n acc     = error "element not in the list"
         find (x:xs) n acc = if x == n then acc else find xs n (acc + 1) 
+
+
+--Checks if given rgb trio is in the list
+isMember::(Integer, Integer, Integer)->[((Integer, Integer, Integer), String)]->Bool
+isMember color list = elem color (map (\x->fst x) list)
+
+--Gives the element at the given index
+elemAt::Int->[a]->a
+elemAt index list@(l:ls) = if index == 0 then l else elemAt (index-1) ls
+
+--Gives the value (HTML color name) of given RGB
+colorName::[((Integer, Integer, Integer),String)]->(Integer, Integer, Integer)->String
+colorName list@(l:ls) val = if val == fst l then snd l else colorName ls val
